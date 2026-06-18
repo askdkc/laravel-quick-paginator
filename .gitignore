@@ -1,0 +1,5 @@
+AGENT.md
+/vendor/
+/.phpunit.cache/
+.DS_Store
+/.phpstan
