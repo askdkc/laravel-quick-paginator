@@ -1,4 +1,9 @@
 # Laravel Quick Paginator
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/askdkc/laravel-quick-paginator.svg)](https://packagist.org/packages/askdkc/laravel-quick-paginator)
+[![GitHub Tests Action Status](https://github.com/askdkc/laravel-quick-paginator/actions/workflows/test.yml/badge.svg)](https://github.com/askdkc/laravel-quick-paginator/actions?query=workflow%3Atest+branch%3Amain)
+[![Total Downloads](https://img.shields.io/packagist/dt/askdkc/laravel-quick-paginator.svg)](https://packagist.org/packages/askdkc/laravel-quick-paginator)
+[![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/askdkc)
+
 
 Laravel Quick Paginator caches only the `total` value used by Laravel's length-aware pagination. On later page requests, it passes that cached total into Laravel's native `paginate()` method so Laravel can skip the repeated pagination `count(*)` query.
 
