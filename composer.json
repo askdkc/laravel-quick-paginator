@@ -3,6 +3,10 @@
     "description": "Speed up Laravel pagination by caching total counts and skipping repeated count queries.",
     "type": "library",
     "license": "MIT",
+    "support": {
+        "issues": "https://github.com/askdkc/laravel-quick-paginator/issues",
+        "source": "https://github.com/askdkc/laravel-quick-paginator"
+    },
     "autoload": {
         "psr-4": {
             "Dkc\\LaravelQuickPaginator\\": "src/"
