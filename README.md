@@ -4,6 +4,34 @@ Laravel Quick Paginator caches only the `total` value used by Laravel's length-a
 
 It does not cache result rows, replace paginator classes, or change the normal `LengthAwarePaginator` response shape.
 
+## Benchmark
+
+In this benchmark, both examples paginate a table with 5,000,000 posts.
+
+Normal Laravel pagination finished in **795.90 ms**:
+
+![Normal pagination benchmark](images/normalpagination.png)
+
+Quick pagination finished in **264.69 ms**:
+
+![Quick pagination benchmark](images/quickpagination.png)
+
+That is roughly **3x faster** in this run. The gain comes from reusing the cached total count instead of repeating Laravel's expensive pagination count query on every page request. Query count alone may not always be lower because cache operations or application queries can still be recorded, but the costly `count(*)` work is avoided on cache hits.
+
+### 日本語
+
+このベンチマークでは、5,000,000 件の posts テーブルに対して pagination を実行しています。
+
+通常の Laravel pagination は **795.90 ms** でした。
+
+![通常の pagination ベンチマーク](images/normalpagination.png)
+
+Quick pagination は **264.69 ms** でした。
+
+![Quick pagination ベンチマーク](images/quickpagination.png)
+
+この実行では、およそ **3 倍高速** になっています。高速化の理由は、ページ移動のたびに重い pagination 用の `count(*)` クエリを繰り返さず、キャッシュ済みの total 件数を再利用するためです。キャッシュ処理やアプリケーション側のクエリが記録されることがあるため、SQL query 数だけが常に少なくなるとは限りませんが、cache hit 時には高コストな `count(*)` を避けられます。
+
 ## Installation
 
 ```bash
@@ -47,6 +75,18 @@ quickPaginate(
     ?string $cacheKey = null,
 )
 ```
+
+## Demo App
+
+If you want to test this package in a real Laravel application, use the demo app here:
+
+https://github.com/askdkc/laravel-quick-pagination-demo
+
+### 日本語
+
+実際の Laravel アプリケーションで試したい場合は、こちらのデモアプリを使ってください。
+
+https://github.com/askdkc/laravel-quick-pagination-demo
 
 ## Configuration
 
