@@ -23,7 +23,16 @@ Laravel Quick Paginator は、LengthAware Pagination の両方の処理を高速
 
 ## Benchmark
 
-In this benchmark, both examples paginate a table with 5,000,000 posts.
+In this local SQLite benchmark, both examples paginate a table with 5,000,000 posts. The quick pagination total cache is already warm.
+
+| Page | Laravel `paginate()` | `quickPaginate()` |
+| --- | ---: | ---: |
+| Page 2 | 206 ms | 1.84 ms |
+| Last page | 470 ms | 285 ms |
+
+Actual results depend on the database engine, indexes, cache store, selected columns, and query shape. The important pattern is that `quickPaginate()` skips the repeated pagination `count(*)` on cache hits and avoids fetching full rows through a deep `offset`.
+
+Example screenshots from another local run:
 
 Normal Laravel pagination finished in **795.90 ms**:
 
@@ -33,7 +42,7 @@ Quick pagination finished in **264.69 ms**:
 
 <img src="images/quickpagination.png" alt="Quick pagination benchmark" width="550">
 
-That is roughly **3x faster** in this run. The gain comes from reusing the cached total count instead of repeating Laravel's expensive pagination count query on every page request. Query count alone may not always be lower because cache operations or application queries can still be recorded, but the costly `count(*)` work is avoided on cache hits.
+Do not judge the optimization by total query count alone. With the deferred-join row fetch, a cache hit usually runs two pagination SQL queries: one key-only inner query and one outer row query. If Laravel's `database` cache store is used, the cache lookup is also recorded as a SQL query. Session reads/writes may add more application queries around either paginator. The important signals are that `quickPaginate()` avoids the expensive pagination `count(*)` on cache hits and avoids `select * ... offset N` for the row fetch.
 
 ### Local benchmark test
 
@@ -49,13 +58,24 @@ RUN_QUICK_PAGINATE_BENCHMARK=1 ./vendor/bin/pest --group=benchmark
 ```
 
 The benchmark warms the quick pagination total cache first, then prints elapsed
-time, query count, and count-query count for both paginators. It also asserts
-that both paginators return the same total and item IDs, and that
+time, SQL query count, and count-query count for both paginators. The SQL query
+count may be higher for `quickPaginate()` because the deferred join intentionally
+splits row fetching into an inner key query and an outer row query. It also
+asserts that both paginators return the same total and item IDs, and that
 `quickPaginate()` does not run a `count(*)` query on the measured cache-hit run.
 
 ### 日本語
 
-このベンチマークでは、5,000,000 件の posts テーブルに対して pagination を実行しています。
+このローカル SQLite ベンチマークでは、5,000,000 件の posts テーブルに対して pagination を実行しています。quick pagination の total cache は warm up 済みです。
+
+| Page | Laravel `paginate()` | `quickPaginate()` |
+| --- | ---: | ---: |
+| 2ページ目 | 206 ms | 1.84 ms |
+| 最終ページ | 470 ms | 285 ms |
+
+実際の結果は、database engine、index、cache store、取得カラム、query の形によって変わります。重要な傾向は、cache hit 時に `quickPaginate()` が繰り返しの pagination 用 `count(*)` を skip し、深い `offset` で full row を取得する処理を避けることです。
+
+別のローカル実行例のスクリーンショットです。
 
 通常の Laravel pagination は **795.90 ms** でした。
 
@@ -65,7 +85,7 @@ Quick pagination は **264.69 ms** でした。
 
 <img src="images/quickpagination.png" alt="Quick pagination benchmark" width="550">
 
-この実行では、およそ **3 倍高速** になっています。高速化の理由は、ページ移動のたびに重い pagination 用の `count(*)` クエリを繰り返さず、キャッシュ済みの total 件数を再利用するためです。キャッシュ処理やアプリケーション側のクエリが記録されることがあるため、SQL query 数だけが常に少なくなるとは限りませんが、cache hit 時には高コストな `count(*)` を避けられます。
+最適化の効果は、総 query 数だけで判断しないでください。deferred join による行取得では、cache hit 時でも通常は pagination 用 SQL が 2 本実行されます。現在ページの key だけを取得する内側クエリと、その key に対して full row を取得する外側クエリです。Laravel の `database` cache store を使っている場合は、cache lookup も SQL query として記録されます。さらに session の read/write など、paginator 以外の application query も前後に追加されることがあります。見るべきポイントは、cache hit 時に `quickPaginate()` が重い pagination 用の `count(*)` を避けることと、行取得で `select * ... offset N` を避けることです。
 
 ### ローカルベンチマークテスト
 
@@ -77,7 +97,7 @@ Quick pagination は **264.69 ms** でした。
 RUN_QUICK_PAGINATE_BENCHMARK=1 ./vendor/bin/pest --group=benchmark
 ```
 
-このベンチマークは、先に quick pagination の total cache を warm up してから、両方の paginator について実行時間、query 数、count query 数を出力します。また、両方の total と item ID が一致すること、計測対象の cache hit 実行で `quickPaginate()` が `count(*)` を実行しないことも検証します。
+このベンチマークは、先に quick pagination の total cache を warm up してから、両方の paginator について実行時間、SQL query 数、count query 数を出力します。`quickPaginate()` は deferred join のために行取得を内側の key query と外側の row query に分けるので、SQL query 数が多くなる場合があります。また、両方の total と item ID が一致すること、計測対象の cache hit 実行で `quickPaginate()` が `count(*)` を実行しないことも検証します。
 
 ## Installation
 
