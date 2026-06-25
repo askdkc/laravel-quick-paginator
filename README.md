@@ -21,11 +21,11 @@ In this benchmark, both examples paginate a table with 5,000,000 posts.
 
 Normal Laravel pagination finished in **795.90 ms**:
 
-<img src="images/normalpagination.png" alt="Normal pagination benchmark" width="550">
+<img src="images/normalpagination1.png" alt="Normal pagination benchmark" width="550">
 
 Quick pagination finished in **264.69 ms**:
 
-<img src="images/quickpagination.png" alt="Quick pagination benchmark" width="550">
+<img src="images/quickpagination1.png" alt="Quick pagination benchmark" width="550">
 
 That is roughly **3x faster** in this run. The gain comes from reusing the cached total count instead of repeating Laravel's expensive pagination count query on every page request. Query count alone may not always be lower because cache operations or application queries can still be recorded, but the costly `count(*)` work is avoided on cache hits.
 
@@ -35,11 +35,11 @@ That is roughly **3x faster** in this run. The gain comes from reusing the cache
 
 通常の Laravel pagination は **795.90 ms** でした。
 
-<img src="images/normalpagination.png" alt="Normal pagination benchmark" width="550">
+<img src="images/normalpagination1.png" alt="Normal pagination benchmark" width="550">
 
 Quick pagination は **264.69 ms** でした。
 
-<img src="images/quickpagination.png" alt="Quick pagination benchmark" width="550">
+<img src="images/quickpagination1.png" alt="Quick pagination benchmark" width="550">
 
 この実行では、およそ **3 倍高速** になっています。高速化の理由は、ページ移動のたびに重い pagination 用の `count(*)` クエリを繰り返さず、キャッシュ済みの total 件数を再利用するためです。キャッシュ処理やアプリケーション側のクエリが記録されることがあるため、SQL query 数だけが常に少なくなるとは限りませんが、cache hit 時には高コストな `count(*)` を避けられます。
 
