@@ -30,9 +30,10 @@ class CachedPaginationServiceProvider extends ServiceProvider
             ?int $ttl = null,
             bool $fresh = false,
             ?string $cacheKey = null,
+            ?string $primaryKey = null,
         ) {
             return app(CachedPaginationManager::class)
-                ->paginate($this, $perPage, $columns, $pageName, $page, $ttl, $fresh, $cacheKey);
+                ->paginate($this, $perPage, $columns, $pageName, $page, $ttl, $fresh, $cacheKey, $primaryKey);
         });
 
         EloquentBuilder::macro('quickPaginate', function (
@@ -43,9 +44,10 @@ class CachedPaginationServiceProvider extends ServiceProvider
             ?int $ttl = null,
             bool $fresh = false,
             ?string $cacheKey = null,
+            ?string $primaryKey = null,
         ) {
             return app(CachedPaginationManager::class)
-                ->paginate($this, $perPage, $columns, $pageName, $page, $ttl, $fresh, $cacheKey);
+                ->paginate($this, $perPage, $columns, $pageName, $page, $ttl, $fresh, $cacheKey, $primaryKey);
         });
     }
 }

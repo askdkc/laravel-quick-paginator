@@ -4,6 +4,7 @@ namespace Dkc\LaravelQuickPaginator\Tests;
 
 use Dkc\LaravelQuickPaginator\CachedPaginationServiceProvider;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Schema\Blueprint;
 use Orchestra\Testbench\TestCase as Orchestra;
 
@@ -38,6 +39,12 @@ abstract class TestCase extends Orchestra
             $table->unsignedInteger('score')->default(0);
             $table->timestamps();
         });
+
+        $this->app['db']->connection()->getSchemaBuilder()->create('posts', function (Blueprint $table): void {
+            $table->id();
+            $table->foreignId('user_id');
+            $table->string('title');
+        });
     }
 
     protected function seedUsers(): void
@@ -48,12 +55,31 @@ abstract class TestCase extends Orchestra
             ['name' => 'Cid', 'active' => true, 'role' => 'member', 'score' => 30],
             ['name' => 'Dee', 'active' => false, 'role' => 'member', 'score' => 40],
         ]);
+
+        Post::query()->insert([
+            ['user_id' => 1, 'title' => 'Hello'],
+            ['user_id' => 2, 'title' => 'World'],
+        ]);
     }
 }
 
 class User extends Model
 {
     protected $table = 'users';
+
+    protected $guarded = [];
+
+    public function posts(): HasMany
+    {
+        return $this->hasMany(Post::class);
+    }
+}
+
+class Post extends Model
+{
+    protected $table = 'posts';
+
+    public $timestamps = false;
 
     protected $guarded = [];
 }
