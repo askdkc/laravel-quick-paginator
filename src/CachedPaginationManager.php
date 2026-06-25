@@ -135,8 +135,11 @@ class CachedPaginationManager
         $cacheKey ??= $this->cacheKeyFactory->make($builder, $pageName);
         $cache = $this->cache();
 
-        if (! $fresh && $cache->has($cacheKey)) {
-            return (int) $cache->get($cacheKey);
+        $missing = new \stdClass();
+        $cached = $fresh ? $missing : $cache->get($cacheKey, $missing);
+
+        if ($cached !== $missing) {
+            return (int) $cached;
         }
 
         $total = $this->countForPagination($builder);
