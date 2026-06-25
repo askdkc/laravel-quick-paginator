@@ -9,11 +9,27 @@ Laravel Quick Paginator caches only the `total` value used by Laravel's length-a
 
 It does not cache result rows, replace paginator classes, or change the normal `LengthAwarePaginator` response shape.
 
+This simple approach is faster than the well-known [Fast Paginate package](https://github.com/aarondfrancis/fast-paginate) by Aaron Francis.
+
+- Benchmark results for page 10 with 5 million records (using SQLite)
+
+| Normal | Quick | Fast |
+| --- | --- | --- |
+| 219 ms | 4.55 ms | 213 ms |
+
+- Benchmark results for page 100000 with 5 million records (using SQLite)
+
+| Normal | Quick | Fast |
+| --- | --- | --- |
+| 463 ms | 285 ms | 464 ms |
+
 ### 日本語
 
 Laravel Quick Paginator は、Laravel の LengthAware Pagination で使われる total 値だけをキャッシュします。以降のページリクエストでは、そのキャッシュ済み total を Laravel 標準の paginate() メソッドに渡すことで、pagination のたびに繰り返される count(*) クエリを Laravel に実行させないようにします。
 
 このパッケージは、結果行をキャッシュしません。paginator クラスを置き換えることもありません。また、通常の LengthAwarePaginator のレスポンス形式も変更しません。
+
+実に単純なアプローチなんですが地味に [Fast Paginate package](https://github.com/aarondfrancis/fast-paginate) よりも速いです。
 
 ## Benchmark
 
