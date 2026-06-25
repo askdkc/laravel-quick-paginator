@@ -34,13 +34,21 @@ Actual results depend on the database engine, indexes, cache store, selected col
 
 Example screenshots from another local run:
 
-Normal Laravel pagination finished in **795.90 ms**:
+Normal Laravel pagination on page 2 finished in **209.86 ms**:
 
 <img src="images/normalpagination.png" alt="Normal pagination benchmark" width="550">
 
-Quick pagination finished in **264.69 ms**:
+Quick pagination on page 2 finished in **4.62 ms**:
 
 <img src="images/quickpagination.png" alt="Quick pagination benchmark" width="550">
+
+Normal Laravel pagination on final page finished in **479.65 ms**:
+
+<img src="images/normalpagination2.png" alt="Normal pagination benchmark" width="550">
+
+Quick pagination on final page finished in **285.52 ms**:
+
+<img src="images/quickpagination2.png" alt="Quick pagination benchmark" width="550">
 
 Do not judge the optimization by total query count alone. With the deferred-join row fetch, a cache hit usually runs two pagination SQL queries: one key-only inner query and one outer row query. If Laravel's `database` cache store is used, the cache lookup is also recorded as a SQL query. Session reads/writes may add more application queries around either paginator. The important signals are that `quickPaginate()` avoids the expensive pagination `count(*)` on cache hits and avoids `select * ... offset N` for the row fetch.
 
